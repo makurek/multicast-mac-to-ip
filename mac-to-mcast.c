@@ -13,33 +13,30 @@ unsigned int ip = 0xe0000000;
    I interpret each char as hex */
 sscanf(input_mac, "%x:%x:%x:%x:%x:%x", &b[0], &b[1], &b[2], &b[3], &b[4], &b[5]);
 
-printf("%d\n", b[3]);
-
 /* Here I put bytes on respective positions */
-unsigned int b0 = b[5];
-unsigned int b1 = b[4] << 8;
-unsigned int b2 = b[3] << 16;
+ip |= b[5];
+ip |= (b[4] << 8);
+ip |= (b[3] << 16);
 
-unsigned int ip1 = b0 | b1;
-unsigned int ip2 = ip1 | b2;
+/* Now my uint looks like this:
+1110 0000 0000 1011 0000 0001 0000 0010
+1110 xxxx x000 1011 0000 0001 0000 0010
 
-printf("%x\n", ip2);
+I have to get all combination of X, so I need to iterate 31 times
+*/
 
-unsigned int ip3 = ip2 | ip;
-
-printf("%x\n", ip3);
-int z;
 for (int i = 0; i < 32; i++)
 {
-  z = ip3 | (i << 23);
-  printf("%x\n", z);
-  unsigned int o4 = (z & 0xff000000) >> 24;
-  unsigned int o3 = (z & 0x00ff0000) >> 16;
-  unsigned int o2 = (z & 0x0000ff00) >> 8;
-  unsigned int o1 = z & 0x000000ff;
-  char buffer[50];
-  sprintf(buffer, "%u %u %u %u\n", o4, o3, o2, o1 );
-  printf("%s\n", buffer);
+  unsigned int temp = ip;
+  temp |= (i << 23);
+
+  unsigned int o4 = (temp & 0xff000000) >> 24;
+  unsigned int o3 = (temp & 0x00ff0000) >> 16;
+  unsigned int o2 = (temp & 0x0000ff00) >> 8;
+  unsigned int o1 = temp & 0x000000ff;
+  char out_buffer[50];
+  sprintf(out_buffer, "#%u\t%u.%u.%u.%u", i, o4, o3, o2, o1 );
+  printf("%s\n", out_buffer);
 }
 
   return 0;
